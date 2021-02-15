@@ -1,0 +1,29 @@
+ wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+   10  sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+   11  sudo apt update
+   12  sudo apt install jenkins -y
+   13  systemctl status jenkins
+   14  systemctl start jenkins
+  systemctl status jenkins
+   25  dpkg -L jenkins
+   26  cd /var/log/
+   27  cd jenkins/
+   28  ls -ltr
+   29  java -jar /usr/share/jenkins/jenkins.war
+   30  netstat -lntp
+   31  sudo systemctl status jenkins
+   32  apt list --installed | grep "java"
+   33  dpkg -L java-common
+   34  update-java-alternatives -l
+   35  vi /etc/environment
+   36  source /etc/environment
+   37  echo $JAVA_HOME
+   38  systemctl restart jenkins
+   39  systemctl status jenkins
+   40  netstat -lntp
+
+
+https://www.logicbig.com/how-to/ubuntu/ubuntu-installing-tomcat.html
+https://linuxize.com/post/how-to-install-jenkins-on-ubuntu-18-04
+https://stackoverflow.com/questions/57028412/how-to-install-nexus-on-ubuntu-18-04
+https://tecadmin.net/how-to-setup-haproxy-load-balancing-on-ubuntu-linuxmint/

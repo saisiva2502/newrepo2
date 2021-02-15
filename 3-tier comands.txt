@@ -1,0 +1,106 @@
+1.Web Server Configuration                      log files in webserver ubuntu
+                                                 /var/log/apache2/access.log
+   Installation                                  /var/log/apache2/error.log
+                                                conf files in webserver ubuntu
+   apt-get update                                /etc/apache2/
+   apt-get install apache2 -y
+    
+  Mod-JK Install
+
+  apt-get install libapache2-mod-jk
+  cd /root
+  wget -qO- https://mirrors.estointernet.in/apache/tomcat/tomcat-connectors/jk/tomcat-connectors-1.2.48-src.tar.gz | tar -xz
+  
+  Mod-JK Configuration
+  
+  cd /etc/apache2/
+  vim workers.properties
+  worker.list=worker1
+  worker.worker1.type=ajp13
+  worker.worker1.host=<IP-ADDRESS-OF-TOMCAT-SERVER>
+  worker.worker1.port=8009
+
+  vim /etc/apache2/mods-available/jk.conf
+  JkWorkersFile /etc/apache2/workers.properties
+  JkLogFile /var/log/apache2/mod_jk.log
+  vim /etc/apache2/sites-enabled/000-default.conf
+  JkMount /studentapp* worker1
+   
+  Start Service
+  systemctl enable apache2
+  systemctl start apache2
+
+           
+2.Tomcat Configuration                                   log files in appserver ubuntu
+                                                         /var/log/tomcat8/catalina.out 
+                                                         conf files in appserver ubuntu
+  Installation                                           /var/lib/tomcat8/conf/
+
+  apt-get update
+  apt-get install default-jdk default-jre -y
+  apt-get install tomcat8 -y
+  apt-get install tomcat8-admin -y
+  systemctl status tomcat8.service 
+  cd /var/lib/tomcat8/lib/
+  wget https://github.com/cit-ager/APP-STACK/raw/master/mysql-connector-java-5.1.40.jar
+  vim /var/lib/tomcat8/conf/tomcat-users.xml  
+  <role rolename="admin-gui"/>
+  <role rolename="manager-gui"/>
+  <role rolename="manager-script"/>
+  <user username="admin" password="password" roles="admin-gui, manager-gui, manager-script"/>
+  
+  Update context.xml for DB Connections
+
+  vim /var/lib/tomcat8/conf/context.xml 
+
+  Add the following config just before the last line
+   
+  <Resource name="jdbc/TestDB" auth="Container" type="javax.sql.DataSource"
+               maxActive="50" maxIdle="30" maxWait="10000"
+               username="student" password="student@1"
+               driverClassName="com.mysql.jdbc.Driver"
+               url="jdbc:mysql://<IP ADDRESS OF DB SERVER>:3306/studentapp"/>
+ 
+  Start Service
+
+  systemctl restart tomcat8 
+
+  To open 8009 port -/var/lib/tomcat8/conf/server.xml
+
+
+3. DB Configuration                                log files in dbserver ubuntu
+                                                   /var/log/apache2/error.log
+                                                   conf files in dbserver ubuntu
+   Installation                                    /etc/mysql/
+   
+   apt-get update
+   apt-get install mariadb-server -y
+   systemctl enable mariadb
+   systemctl start mariadb
+  
+   Configuration
+
+   mysql
+
+     create database studentapp;
+     use studentapp;
+     CREATE TABLE Students(student_id INT NOT NULL AUTO_INCREMENT,
+	student_name VARCHAR(100) NOT NULL,
+        student_addr VARCHAR(100) NOT NULL,
+	student_age VARCHAR(3) NOT NULL,
+	student_qual VARCHAR(20) NOT NULL,
+	student_percent VARCHAR(10) NOT NULL,
+	student_year_passed VARCHAR(10) NOT NULL,
+	PRIMARY KEY (student_id)
+     );
+     grant all privileges on studentapp.* to 'student'@'%' identified by 'student@1';
+     flush privileges;
+  
+   To make bind adress to 0.0.0.0
+   vim /etc/mysql/mariadb.conf.d/50-server.cnf  
+
+   To check connections
+   netstat -lntp
+   telnet localhost port
+
+  
